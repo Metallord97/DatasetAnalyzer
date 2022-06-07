@@ -5,6 +5,7 @@ import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
 import myexception.SetTypeException;
 import utils.BookkeeperData;
+import utils.CSVRow;
 import utils.StringConstant;
 import utils.ZookeeperData;
 import weka.classifiers.Evaluation;
@@ -99,14 +100,14 @@ public class WalkForward {
             naiveBayesEvaluation = WalkForwardUtils.simpleClassify(newTraining, newTesting, new NaiveBayes());
             iBkEvaluation = WalkForwardUtils.simpleClassify(newTraining, newTesting, new IBk());
 
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.RANDOM_FOREST, StringConstant.NO, StringConstant.NO, StringConstant.NO,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.RANDOM_FOREST, StringConstant.NO, StringConstant.NO, StringConstant.NO),
                     randomForestEvaluation);
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.NAIVE_BAYES, StringConstant.NO, StringConstant.NO, StringConstant.NO,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.NAIVE_BAYES, StringConstant.NO, StringConstant.NO, StringConstant.NO),
                     naiveBayesEvaluation);
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.IBK, StringConstant.NO, StringConstant.NO, StringConstant.NO,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.IBK, StringConstant.NO, StringConstant.NO, StringConstant.NO),
                     iBkEvaluation);
 
 
@@ -115,14 +116,14 @@ public class WalkForward {
             naiveBayesEvaluation = WalkForwardUtils.attributeSelection(newTraining, newTesting, new NaiveBayes());
             iBkEvaluation = WalkForwardUtils.attributeSelection(newTraining, newTesting, new IBk());
 
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.RANDOM_FOREST, StringConstant.NO, StringConstant.YES, StringConstant.NO,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.RANDOM_FOREST, StringConstant.NO, StringConstant.YES, StringConstant.NO),
                     randomForestEvaluation);
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.NAIVE_BAYES, StringConstant.NO, StringConstant.YES, StringConstant.NO,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.NAIVE_BAYES, StringConstant.NO, StringConstant.YES, StringConstant.NO),
                     naiveBayesEvaluation);
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.IBK, StringConstant.NO, StringConstant.YES, StringConstant.NO,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.IBK, StringConstant.NO, StringConstant.YES, StringConstant.NO),
                     iBkEvaluation);
 
             /* Cost Sensitivity */
@@ -130,14 +131,14 @@ public class WalkForward {
             naiveBayesEvaluation = WalkForwardUtils.costSensitivityEval(newTraining, newTesting, new NaiveBayes(), 1, 10);
             iBkEvaluation = WalkForwardUtils.costSensitivityEval(newTraining, newTesting, new IBk(), 1, 10);
 
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.RANDOM_FOREST, StringConstant.NO, StringConstant.NO, StringConstant.YES,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.RANDOM_FOREST, StringConstant.NO, StringConstant.NO, StringConstant.YES),
                     randomForestEvaluation);
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.NAIVE_BAYES, StringConstant.NO, StringConstant.NO, StringConstant.YES,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.NAIVE_BAYES, StringConstant.NO, StringConstant.NO, StringConstant.YES),
                     naiveBayesEvaluation);
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.IBK, StringConstant.NO, StringConstant.NO, StringConstant.YES,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.IBK, StringConstant.NO, StringConstant.NO, StringConstant.YES),
                     iBkEvaluation);
 
             /* Feature Selection & Cost sensitivity */
@@ -145,14 +146,14 @@ public class WalkForward {
             naiveBayesEvaluation = WalkForwardUtils.featureSelectionThenCostSensitivity(newTraining, newTesting, new NaiveBayes(), 1, 10);
             iBkEvaluation = WalkForwardUtils.featureSelectionThenCostSensitivity(newTraining, newTesting, new IBk(), 1, 10);
 
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.RANDOM_FOREST, StringConstant.NO, StringConstant.YES, StringConstant.YES,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.RANDOM_FOREST, StringConstant.NO, StringConstant.YES, StringConstant.YES),
                     randomForestEvaluation);
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.NAIVE_BAYES, StringConstant.NO, StringConstant.YES, StringConstant.YES,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.NAIVE_BAYES, StringConstant.NO, StringConstant.YES, StringConstant.YES),
                     naiveBayesEvaluation);
-            WalkForwardUtils.writeResultLine(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
-                    pctDefectiveInTesting, StringConstant.IBK, StringConstant.NO, StringConstant.YES, StringConstant.YES,
+            WalkForwardUtils.writeResultLine(new CSVRow(outputFile, datasetName, i, pctDataOnTraining, pctDefectiveInTraining,
+                    pctDefectiveInTesting, StringConstant.IBK, StringConstant.NO, StringConstant.YES, StringConstant.YES),
                     iBkEvaluation);
 
         }
