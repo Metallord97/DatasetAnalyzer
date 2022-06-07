@@ -6,7 +6,12 @@ import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.AttributeSelection;
 
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 public class FeatureSelection {
+    private static final Logger LOGGER = LogManager.getLogManager().getLogger(FeatureSelection.class.getName());
     private FeatureSelection(){}
 
     public static AttributeSelection createBestFirstFilter(Instances trainingSet) {
@@ -18,20 +23,20 @@ public class FeatureSelection {
         try {
             filter.setInputFormat(trainingSet);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "Exception caught", e);
         }
 
         return filter;
     }
 
     public static Instances createFilteredInstances(Instances instances, AttributeSelection filter) {
-        Instances filteredInstances;
+        Instances filteredInstances = null;
         try {
             filteredInstances = Filter.useFilter(instances, filter);
             int numAttr = filteredInstances.numAttributes();
             filteredInstances.setClassIndex(numAttr - 1);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "Exception caught", e);
         }
         return filteredInstances;
     }

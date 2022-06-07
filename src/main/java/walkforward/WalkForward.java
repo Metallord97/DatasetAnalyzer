@@ -3,6 +3,7 @@ package walkforward;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
+import myexception.SetTypeException;
 import utils.BookkeeperData;
 import utils.StringConstant;
 import utils.ZookeeperData;
@@ -26,7 +27,7 @@ public class WalkForward {
 
     private WalkForward() {}
 
-    public static InputStream getSet(File dataset, SetType setType, int trainingSetSize, int testingSetSize) {
+    public static InputStream getSet(File dataset, SetType setType, int trainingSetSize, int testingSetSize) throws SetTypeException {
         InputStream inputStream = null;
 
         try(CSVReader csvReader = new CSVReaderBuilder(new FileReader(dataset)).withSkipLines(1).build();
@@ -39,18 +40,16 @@ public class WalkForward {
                 case TRAINING:
                     List<String[]> firstRows = WalkForwardUtils.readLines(csvReader, trainingSetSize);
                     WalkForwardUtils.writeRows(writer, firstRows);
-                    //System.out.println("Training set size: " + trainingSetSize);
                     break;
 
                 case TESTING:
                     csvReader.skip(trainingSetSize);
                     List<String[]> lastRows = WalkForwardUtils.readLines(csvReader, testingSetSize);
                     WalkForwardUtils.writeRows(writer, lastRows);
-                    //System.out.println("Testing set size: " + testingSetSize);
                     break;
 
                 default:
-                    throw new RuntimeException("SetType must be TRAINING or TESTING");
+                    throw new SetTypeException("SetType must be TRAINING or TESTING");
             }
 
             writer.flush();

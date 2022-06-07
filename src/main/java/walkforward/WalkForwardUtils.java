@@ -6,12 +6,14 @@ import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 import featureselection.FeatureSelection;
+import myexception.CountLineCSVException;
 import myexception.NumberOfReleaseOutOfBoundException;
 import utils.Dataset;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.CostMatrix;
 import weka.classifiers.Evaluation;
 import weka.classifiers.meta.CostSensitiveClassifier;
+import weka.core.Debug;
 import weka.core.Instances;
 import weka.filters.supervised.attribute.AttributeSelection;
 import weka.filters.unsupervised.attribute.Remove;
@@ -20,8 +22,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class WalkForwardUtils {
+    private static final Logger LOGGER = LogManager.getLogManager().getLogger(WalkForwardUtils.class.getName());
     private WalkForwardUtils() {}
 
     public static void writeHeader(PrintWriter writer, String datasetName) {
@@ -61,9 +67,9 @@ public class WalkForwardUtils {
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "I/O Exception", e);
         } catch (CsvException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "CSVException", e);
         }
 
         return size;
@@ -107,11 +113,11 @@ public class WalkForwardUtils {
             }
 
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "File not found", e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "I/O Exception", e);
         } catch (CsvException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "CSV Exception", e);
         }
 
         return releaseScanned.size();
@@ -133,11 +139,11 @@ public class WalkForwardUtils {
                 testingSetSize++;
             }
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "File not found", e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "I/O Exception", e);
         } catch (CsvException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "CSV Exception", e);
         }
 
         return testingSetSize;
@@ -175,11 +181,11 @@ public class WalkForwardUtils {
             csvWriter.flush();
 
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "File not found", e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "I/O Exception", e);
         } catch (CsvValidationException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "CSV Validation Exception", e);
         }
 
         return outputFile;
@@ -212,7 +218,7 @@ public class WalkForwardUtils {
             csvWriter.writeNext(header);
             csvWriter.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "I/O Exception", e);
         }
     }
 
@@ -238,14 +244,14 @@ public class WalkForwardUtils {
             csvWriter.flush();
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "I/O Exception", e);
         }
 
     }
 
     public static Evaluation attributeSelection(Instances trainingSet, Instances testingSet, AbstractClassifier classifier) {
         AttributeSelection attributeSelection = FeatureSelection.createBestFirstFilter(trainingSet);
-        Evaluation evaluation;
+        Evaluation evaluation = null;
         try {
             Instances filteredTrainingSet = FeatureSelection.createFilteredInstances(trainingSet, attributeSelection);
             Instances filteredTestingSet = FeatureSelection.createFilteredInstances(testingSet, attributeSelection);
@@ -253,33 +259,36 @@ public class WalkForwardUtils {
             evaluation = new Evaluation(filteredTrainingSet);
             evaluation.evaluateModel(classifier, filteredTestingSet);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "Exception caught", e);
         }
         return evaluation;
     }
 
     public static Evaluation simpleClassify(Instances trainingSet, Instances testingSet, AbstractClassifier classifier) {
-        Evaluation eval;
+        Evaluation eval = null;
         try {
             classifier.buildClassifier(trainingSet);
             eval = new Evaluation(trainingSet);
             eval.evaluateModel(classifier, testingSet);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "Exception caught", e);
         }
         return eval;
     }
 
-    public static int countLinesCSV(File file) {
-        List<String[]> allRows;
+    public static int countLinesCSV(File file) throws CountLineCSVException {
+        List<String[]> allRows = null;
         try(CSVReader csvReader = new CSVReaderBuilder(new FileReader(file)).withSkipLines(1).build()) {
             allRows = csvReader.readAll();
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "File not found", e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "I/O Exception", e);
         } catch (CsvException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "CSV Exception", e);
+        }
+        if(allRows == null) {
+            throw new CountLineCSVException("allRows is null");
         }
         return allRows.size();
     }
@@ -295,7 +304,7 @@ public class WalkForwardUtils {
 
     public static Evaluation costSensitivityEval(Instances trainingSet, Instances testingSet, AbstractClassifier classifier, double costFalsePositive,
                                                  double costFalseNegative) {
-        Evaluation eval;
+        Evaluation eval = null;
         try {
             CostSensitiveClassifier costSensitiveClassifier = new CostSensitiveClassifier();
             costSensitiveClassifier.setClassifier(classifier);
@@ -305,7 +314,7 @@ public class WalkForwardUtils {
             eval = new Evaluation(trainingSet, costSensitiveClassifier.getCostMatrix());
             eval.evaluateModel(costSensitiveClassifier, testingSet);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "Exception caught in cost sensitivity", e);
         }
 
         return eval;
